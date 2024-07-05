@@ -17,14 +17,16 @@ import { sign } from "hono/jwt";
 
 
 userRouter.post("/signup", async (c) => {
-    const prisma = new PrismaClient({
-      datasourceUrl: c.env?.DATABASE_URL,
-    }).$extends(withAccelerate());
-  
-    const body = await c.req.json();
-    console.log(body);
+   
+  // console.log('kkk');
   
     try {
+      const prisma = new PrismaClient({
+        datasourceUrl: c.env?.DATABASE_URL,
+      }).$extends(withAccelerate());
+    
+      const body = await c.req.json();
+      
       const user = await prisma.user.create({
         data: {
           email: body.email,
@@ -40,21 +42,30 @@ userRouter.post("/signup", async (c) => {
   });
   
   userRouter.post("/signin", async (c) => {
-    const prisma = new PrismaClient({
-      datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate());
-    const body = await c.req.json();
-    const user = await prisma.user.findUnique({
-      where:{
-          email:body.email
+    try {
+      const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+      }).$extends(withAccelerate());
+      
+      const body = await c.req.json();
+      console.log(body);
+  
+      const user = await prisma.user.findUnique({
+        where: {
+          email: body.email,
+        },
+      });
+  
+      if (!user) {
+        c.status(403);
+        return c.json({ error: "user not found" });
       }
-    })
-    if (!user) {
-      c.status(403);
-      return c.json({ error: "user not found" });
-  }
   
-  const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
+      const jwt = await sign({ id: user.id }, c.env.JWT_SECRET);
       return c.json({ jwt });
-  })	
-  
+    } catch (e) {
+      console.error(e);
+      c.status(500);
+      return c.json({ error: "Error during signin" });
+    }
+  });

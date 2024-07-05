@@ -11,8 +11,8 @@ const app = new Hono<{
   // Variables : Variables
 }>();
 
-app.route("/api/vi/user", userRouter)
-app.route("/api/vi/blog",blogRouter )
+app.route("/api/v1/user", userRouter)
+app.route("/api/v1/blog",blogRouter )
 
 app.use('/api/v1/blog/*', async (c, next) => {
 	await next()
