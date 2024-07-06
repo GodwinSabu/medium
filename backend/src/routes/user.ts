@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 // import { Hono } from 'hono';
 import { sign } from "hono/jwt";
+import {signupInput} from "@godwinsabu/medium-common"
 
 
 
@@ -17,16 +18,15 @@ import { sign } from "hono/jwt";
 
 
 userRouter.post("/signup", async (c) => {
-   
-  // console.log('kkk');
-  
     try {
+
       const prisma = new PrismaClient({
         datasourceUrl: c.env?.DATABASE_URL,
       }).$extends(withAccelerate());
     
       const body = await c.req.json();
-      
+      const{success} = signupInput.safeParse(body)
+
       const user = await prisma.user.create({
         data: {
           email: body.email,
