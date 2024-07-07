@@ -23,7 +23,7 @@ blogRouter.use("/*", async (c, next) => {
       // @ts-ignore
       c.set("userId", user.id);
         await next();
-    } else {
+    } else{
       c.status(403);
       return c.json({
         message: "you are not looged in ",
